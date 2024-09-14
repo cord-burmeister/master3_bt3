@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <KeepRunningUntilFailure>
+                <Sequence>
+                    <Action ID="SaySomething" message="message" />
+                </Sequence>
+        </KeepRunningUntilFailure>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="SaySomething">
+            <input_port name="message"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>

@@ -2,7 +2,7 @@
   <arg name="sleep_server" default="true"/>
 
   <node pkg="master3_bt" exec="master3_bt_executor" output="screen">
-    <param from="$(find-pkg-share master3_bt)/config/master3_bt_executor.yaml"/>
+    <param from="$(find-pkg-share master3_bt3)/config/master3_bt_executor.yaml"/>
   </node>
 
   <group if="$(var sleep_server)">

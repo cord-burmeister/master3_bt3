@@ -1,75 +1,93 @@
 cmake_minimum_required(VERSION 3.16)
 project(master3_bt3)
 
+
+set(CMAKE_CONFIG_PATH ${CMAKE_MODULE_PATH}  "${CMAKE_CURRENT_LIST_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CONFIG_PATH}")
+
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(behaviortree_cpp_v3 REQUIRED)
+find_package(action_msgs REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(nav2_msgs REQUIRED)
+find_package(ament_index_cpp REQUIRED)
+
+find_package(ZMQ)
+if(ZMQ_FOUND)
+    message(STATUS "ZeroMQ found.")
+    add_definitions(-DZMQ_FOUND)
+else()
+  message(WARNING "ZeroMQ NOT found. Not including PublisherZMQ.")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-find_package(ament_cmake REQUIRED)
-find_package(std_msgs REQUIRED)
-find_package(std_srvs REQUIRED)
+set(dependencies
+    rclcpp
+    rclcpp_lifecycle
+    rclcpp_action
+    behaviortree_cpp_v3
+    action_msgs
+    lifecycle_msgs
+    geometry_msgs
+    nav2_msgs
+    ament_index_cpp
+)
 
-set(THIS_PACKAGE_DEPS
-    std_msgs
-    std_srvs )
+include_directories(include ${ZMQ_INCLUDE_DIRS})
 
-######################################################
-# Simple example showing how to use and customize the BtExecutionServer
-# add_executable(master3_bt_executor src/master3_bt_executor.cpp)
-# ament_target_dependencies(master3_bt_executor ${THIS_PACKAGE_DEPS})
+add_library(br2_recharge_bt_node SHARED src/br2_bt_patrolling/Recharge.cpp)
+add_library(br2_patrol_bt_node SHARED src/br2_bt_patrolling/Patrol.cpp)
+add_library(br2_saysomething_bt_node SHARED src/br2_bt_patrolling/SaySomething.cpp)
+add_library(br2_move_bt_node SHARED src/br2_bt_patrolling/Move.cpp)
+add_library(br2_get_waypoint_bt_node SHARED src/br2_bt_patrolling/GetWaypoint.cpp)
+add_library(br2_battery_checker_bt_node SHARED src/br2_bt_patrolling/BatteryChecker.cpp)
+add_library(br2_track_objects_bt_node SHARED src/br2_bt_patrolling/TrackObjects.cpp)
+list(APPEND plugin_libs
+  br2_recharge_bt_node
+  br2_patrol_bt_node
+  br2_move_bt_node
+  br2_get_waypoint_bt_node
+  br2_battery_checker_bt_node
+  br2_track_objects_bt_node
+  br2_saysomething_bt_node
+)
 
-######################################################
-# Build an Action Client that calls the sleep action (STATIC version)
 
-# add_executable(sleep_client
-#   src/sleep_action.cpp
-#   src/sleep_client.cpp)
-# ament_target_dependencies(sleep_client ${THIS_PACKAGE_DEPS})
+foreach(bt_plugin ${plugin_libs})
+  ament_target_dependencies(${bt_plugin} ${dependencies})
+  target_compile_definitions(${bt_plugin} PRIVATE BT_PLUGIN_EXPORT)
+endforeach()
 
-######################################################
-# Build a client that call the sleep action (Plugin version)
+add_executable(behavior_main src/behavior_main.cpp)
+ament_target_dependencies(behavior_main ${dependencies})
+target_link_libraries(behavior_main ${ZMQ_LIBRARIES})
 
-# add_library(sleep_plugin SHARED src/sleep_action.cpp)
-# target_compile_definitions(sleep_plugin PRIVATE  BT_PLUGIN_EXPORT )
-# ament_target_dependencies(sleep_plugin ${THIS_PACKAGE_DEPS})
-
-# add_executable(sleep_client_dyn src/sleep_client.cpp)
-# target_compile_definitions(sleep_client_dyn PRIVATE USE_SLEEP_PLUGIN )
-# target_link_libraries(sleep_client_dyn sleep_plugin )
-# ament_target_dependencies(sleep_client_dyn ${THIS_PACKAGE_DEPS})
-
-######################################################
-# Build Server
-# add_executable(sleep_server src/sleep_server.cpp)
-# ament_target_dependencies(sleep_server ${THIS_PACKAGE_DEPS})
-
-# ######################################################
-# # Build subscriber_test
-# add_executable(subscriber_test src/subscriber_test.cpp)
-# ament_target_dependencies(subscriber_test ${THIS_PACKAGE_DEPS})
-
-# ######################################################
-# # the SetBool test
-# add_executable(bool_client src/bool_client.cpp src/set_bool_node.cpp)
-# ament_target_dependencies(bool_client ${THIS_PACKAGE_DEPS})
-
-# add_executable(bool_server src/bool_server.cpp )
-# ament_target_dependencies(bool_server ${THIS_PACKAGE_DEPS})
-
-######################################################
-# INSTALL
 
 install(TARGETS
-  # sleep_client
-  # sleep_client_dyn
-  # sleep_server
-  # sleep_plugin
-  # subscriber_test
-  # master3_bt_executor
-  # bool_client
-  # bool_server
-  DESTINATION lib/${PROJECT_NAME}
-  )
+  ${plugin_libs}
+  behavior_main
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY include/
+  DESTINATION include/
+)
+
+######################################################
+# INSTALL Behavior.xml's, ROS config and launch files
+
+install(DIRECTORY behavior_trees launch
+  DESTINATION share/${PROJECT_NAME}
+)
 
 ######################################################
 # INSTALL plugins for other packages to load
@@ -80,16 +98,6 @@ install(TARGETS
   ARCHIVE DESTINATION share/${PROJECT_NAME}/bt_plugins
   RUNTIME DESTINATION share/${PROJECT_NAME}/bt_plugins
   )
-
-######################################################
-# INSTALL Behavior.xml's, ROS config and launch files
-
-install(DIRECTORY
-    # behavior_trees
-    # config
-    launch
-    DESTINATION share/${PROJECT_NAME}/
-    )
 
 
 # ament_export_dependencies(behaviortree_ros2 btcpp_ros2_interfaces)
