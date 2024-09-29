@@ -54,8 +54,8 @@ BatteryChecker::update_battery()
 {
   float battery_level;
   if (!config().blackboard->get("battery_level", battery_level)) {
-    battery_level = 20.0f;
-// HACK    battery_level = 100.0f;
+  // HACK        battery_level = 20.0f;
+    battery_level = 100.0f;
   }
 
   float dt = (node_->now() - last_reading_time_).seconds();

@@ -41,25 +41,59 @@ GetWaypoint::GetWaypoint(
   wp.header.frame_id = "map";
   wp.pose.orientation.w = 1.0;
 
-  // recharge wp
-  wp.pose.position.x = 3.67;
-  wp.pose.position.y = -0.24;
+  //   // recharge wp
+  //  x: 0.019 
+  //       y: .003
+  //       z: 0.0
+  //       yaw: 0.0 #yaw: 1.615  
+  wp.pose.position.x = 0.019;
+  wp.pose.position.y = 0.003;
+  wp.pose.orientation.w = 0.0;
   recharge_point_ = wp;
+  // wp.pose.position.x = 3.67;
+  // wp.pose.position.y = -0.24;
+  // recharge_point_ = wp;
 
   // wp1
-  wp.pose.position.x = 1.07;
-  wp.pose.position.y = -12.38;
+  wp.pose.position.x = 4.7;
+  wp.pose.position.y = 0.7;
   waypoints_.push_back(wp);
 
   // wp2
-  wp.pose.position.x = -5.32;
-  wp.pose.position.y = -8.85;
+  wp.pose.position.x = 7.1;
+  wp.pose.position.y = -0.96;
   waypoints_.push_back(wp);
 
   // wp3
-  wp.pose.position.x = -0.56;
-  wp.pose.position.y = 0.24;
+  wp.pose.position.x = 3.0;
+  wp.pose.position.y = -4.4;
   waypoints_.push_back(wp);
+  
+  // wp4
+  wp.pose.position.x = -1.6;
+  wp.pose.position.y = -2.6;
+  waypoints_.push_back(wp);
+
+  // wp5
+  wp.pose.position.x = -8.5;
+  wp.pose.position.y = -2.7;
+  waypoints_.push_back(wp);
+
+  // wp6
+  wp.pose.position.x = -4.16;
+  wp.pose.position.y = 0.8;
+  waypoints_.push_back(wp);
+
+  // wp6
+  wp.pose.position.x = -4.16;
+  wp.pose.position.y = 0.8;
+  waypoints_.push_back(wp);
+
+  // wp7
+  wp.pose.position.x = 2.16;
+  wp.pose.position.y = 4.4;
+  waypoints_.push_back(wp);
+
 }
 
 void

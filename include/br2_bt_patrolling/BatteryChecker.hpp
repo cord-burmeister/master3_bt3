@@ -44,8 +44,8 @@ public:
 
   void vel_callback(const geometry_msgs::msg::Twist::SharedPtr msg);
 
-  // HACK const float DECAY_LEVEL = 0.5;  // 0.5 * |vel| * dt
-  const float DECAY_LEVEL = 2.5;  // 0.5 * |vel| * dt
+  const float DECAY_LEVEL = 0.5;  // 0.5 * |vel| * dt
+  // HACK const float DECAY_LEVEL = 2.5;  // 0.5 * |vel| * dt
   const float EPSILON = 0.01;  // 0.001 * dt
   const float MIN_LEVEL = 10.0;
   

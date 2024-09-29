@@ -19,8 +19,10 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PythonExpression, PathJoinSubstitution, TextSubstitution
 from launch_ros.actions import Node
-
+from launch.actions.execute_process import ExecuteProcess
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
@@ -28,6 +30,20 @@ def generate_launch_description():
 
     # tracking_cmd = IncludeLaunchDescription(
     #     PythonLaunchDescriptionSource(os.path.join(tracking_dir, 'launch', 'tracking.launch.py')))
+
+     # Get the install directory from the environment variable
+    install_dir = os.getenv('COLCON_PREFIX_PATH').split(':')[0]
+
+    # Define the path to your package within the install directory
+    groot_path = os.path.join(install_dir, 'groot',
+                    'lib',
+                    'groot',
+                    'Groot')
+
+    groot_cmd = ExecuteProcess(
+            cmd=[groot_path, '--autoconnect', '--mode' , 'monitor', '--publisher_port', '2666', '--server_port', '2667',],
+            output='screen'
+        )
 
     patrolling_cmd = Node(
         package='master3_bt3',
@@ -47,5 +63,6 @@ def generate_launch_description():
     # Add any actions
 #    ld.add_action(tracking_cmd)
     ld.add_action(patrolling_cmd)
+    ld.add_action(groot_cmd)
 
     return ld
